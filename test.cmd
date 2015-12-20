@@ -1,1 +1,1 @@
-@tsc -f spec\funclib.spec.lua
+@tsc -f spec\*.spec.lua
