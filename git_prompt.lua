@@ -62,12 +62,14 @@ local function git_prompt_filter()
     -- print (git.get_config(git_dir, 'branch "'..branch..'"', 'remote'))
     local remote_to_push = git.get_config(git_dir, 'branch "'..branch..'"', 'remote') or 'origin'
     local remote_ref = git.get_config(git_dir, 'remote "'..remote_to_push..'"', 'push') or
-        git.get_config(git_dir, 'push', 'default') or branch
+        git.get_config(git_dir, 'push', 'default')
 
-    clink.prompt.value = string.gsub(clink.prompt.value, '{git}',
-        '{git} => ('..remote_to_push..'/'..remote_ref..')')
+    local text = remote_to_push
+    if (remote_ref) then text = text..'/'..remote_ref end
+
+    clink.prompt.value = string.gsub(clink.prompt.value, branch, branch..' -> '..text)
 
     return false
 end
 
-clink.prompt.register_filter(git_prompt_filter, 45)
+clink.prompt.register_filter(git_prompt_filter, 60)
