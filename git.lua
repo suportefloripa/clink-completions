@@ -30,8 +30,8 @@ local function list_packed_refs(git_dir)
     return result
 end
 
-local function list_remote_branches(git_dir)git.
-    local git_dir = git_dir or get_git_dir()
+local function list_remote_branches(git_dir)
+    local git_dir = git_dir or git.get_git_dir()
     if not git_dir then return w() end
 
     return w(path.list_files(git_dir..'/refs/remotes', '/*',
@@ -45,8 +45,8 @@ end
  --
  -- @param string [git_dir]  Git directory, where to search for remote branches
  -- @return table  List of branches.
-local function list_local_branches(git_dir)git.
-    local git_dir = git_dir or get_git_dir()
+local function list_local_branches(git_dir)
+    local git_dir = git_dir or git.get_git_dir()
     if not git_dir then return w() end
 
     local result = w(path.list_files(git_dir..'/refs/heads', '/*',
@@ -55,8 +55,8 @@ local function list_local_branches(git_dir)git.
     return result
 end
 
-local branches = function (token)git.
-    local git_dir = get_git_dir()
+local branches = function (token)
+    local git_dir = git.get_git_dir()
     if not git_dir then return w() end
 
     return list_local_branches(git_dir)
@@ -65,11 +65,11 @@ local branches = function (token)git.
     end)
 end
 
-local function alias(token)git.
+local function alias(token)
     local res = w()
 
     -- Try to resolve .git directory location
-    local git_dir = get_git_dir()
+    local git_dir = git.get_git_dir()
 
     if git_dir == nil then return res end
 
@@ -90,9 +90,9 @@ local function alias(token)git.
     return res
 end
 
-local function remotes(token)git.
+local function remotes(token)
     local remotes = w()
-    local git_dir = get_git_dir()
+    local git_dir = git.get_git_dir()
     if not git_dir then return remotes end
 
     local git_config = io.open(git_dir..'/config')
@@ -110,9 +110,9 @@ local function remotes(token)git.
     return remotes
 end
 
-local function local_or_remote_branches(token)git.
+local function local_or_remote_branches(token)
     -- Try to resolve .git directory location
-    local git_dir = get_git_dir()
+    local git_dir = git.get_git_dir()
     if not git_dir then return w() end
 
     return list_local_branches(git_dir)
