@@ -38,6 +38,17 @@ local function load_ini(fileName)
     return data;
 end
 
+---
+ -- Escapes every non-alphanumeric character in string with % symbol. This is required
+ -- because string.gsub treats plain strings with some symbols (e.g. dashes) as regular
+ -- expressions (taken from http://stackoverflow.com/a/34953646)
+ -- @param {string} text Text to escape
+ -- @returns {string} Escaped text
+---
+function escape(text)
+    return text and text:gsub("([^%w])", "%%%1") or ""
+end
+
 local git = {}
 git.get_config = function (git_dir, section, param)
     if not git_dir then return nil end
@@ -59,7 +70,6 @@ local function git_prompt_filter()
     if not branch then return false end
 
     -- for remote and ref resolution algorithm see https://git-scm.com/docs/git-push
-    -- print (git.get_config(git_dir, 'branch "'..branch..'"', 'remote'))
     local remote_to_push = git.get_config(git_dir, 'branch "'..branch..'"', 'remote') or 'origin'
     local remote_ref = git.get_config(git_dir, 'remote "'..remote_to_push..'"', 'push') or
         git.get_config(git_dir, 'push', 'default')
@@ -67,9 +77,11 @@ local function git_prompt_filter()
     local text = remote_to_push
     if (remote_ref) then text = text..'/'..remote_ref end
 
-    clink.prompt.value = string.gsub(clink.prompt.value, branch, branch..' -> '..text)
+    clink.prompt.value = clink.prompt.value:gsub(escape(branch), '%1 -> '..text)
 
     return false
 end
 
+-- Register filter with priority 60 which is greater than
+-- Cmder's git prompt filters to override them
 clink.prompt.register_filter(git_prompt_filter, 60)
